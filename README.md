@@ -1,4 +1,4 @@
-#Astrotrails
+# Astrotrails
 Tool to generate startrails images by stacking consecutive acquisition in jpeg format. It can also generate timelapse videos.
 
 ## Setup and installation
