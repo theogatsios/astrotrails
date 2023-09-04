@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "astrotrails"
-version = "0.1.3"
+version = "2023.09.04"
 authors = [
     {name = "Theo Gatsios", email = "theogat@protonmail.com"},
 ]
@@ -21,10 +21,12 @@ dependencies = [
     "Pillow",
     "progress",
     "ffmpeg",
+    "customtkinter"
 ]
 
 [project.scripts]
 astrotrails = "astrotrails.command_line:main"
+astrotrails-gui = "astrotrails.astrogui:App"
 
 # ... other project metadata fields as specified in:
 #     https://packaging.python.org/en/latest/specifications/declaring-project-metadata/

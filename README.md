@@ -9,9 +9,9 @@ pip install astrotrails
 
 This will put the executable `astrotrails` in your path 
 
-Running
+## Running
 ```bash
 astrotrails jpegsDirectory 1
 ```
-will search for jpegs files with the same dimensions into `jpegsDirectory` and will generate startrails image and timelapse video (mode 1)
+The execution of the above will search for jpegs files into `jpegsDirectory` and will generate startrails image and timelapse video (mode 1)
 
