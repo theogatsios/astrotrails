@@ -2,7 +2,7 @@
 [![license](https://img.shields.io/github/license/theogatsios/astrotrails.svg)](https://github.com/theogatsios/astrotrails/blob/main/LICENSE.txt)
 [![pypi](https://shields.io/pypi/v/astrotrails.svg)](https://pypi.org/project/astrotrails/)
 
-Tool to generate startrails images by stacking consecutive acquisition in jpeg format. It can also generate timelapse videos.
+Astrotrails generates startrails images by stacking multiple photographs of the night sky. It takes a series of individual night sky photos and combines them to create a composite image (and also a timelapse video) that showcases the apparent motion of stars as the Earth rotates.
 
 ## Installation using pip
 
