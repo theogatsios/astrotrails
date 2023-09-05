@@ -1,8 +1,10 @@
 # Astrotrails
+[![license](https://img.shields.io/github/license/theogatsios/astrotrails.svg)](https://github.com/theogatsios/astrotrails/blob/main/LICENSE.txt)
 [![pypi](https://shields.io/pypi/v/astrotrails.svg)](https://pypi.org/project/astrotrails/)
+
 Tool to generate startrails images by stacking consecutive acquisition in jpeg format. It can also generate timelapse videos.
 
-## Setup and installation
+## Installation using pip
 
 ```bash
 pip install astrotrails
@@ -10,7 +12,7 @@ pip install astrotrails
 
 This will put the executable `astrotrails` in your path 
 
-## Running
+## Running on terminal
 ```bash
 astrotrails jpegsDirectory 1
 ```
