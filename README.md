@@ -1,4 +1,5 @@
 # Astrotrails
+[![pypi](https://shields.io/pypi/v/astrotrails.svg)](https://pypi.org/project/astrotrails/)
 Tool to generate startrails images by stacking consecutive acquisition in jpeg format. It can also generate timelapse videos.
 
 ## Setup and installation
