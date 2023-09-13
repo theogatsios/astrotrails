@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "astrotrails"
-version = "2023.09.04"
+version = "2023.09.13"
 authors = [
     {name = "Theo Gatsios", email = "theogat@protonmail.com"},
 ]
@@ -21,7 +21,8 @@ dependencies = [
     "Pillow",
     "progress",
     "ffmpeg",
-    "customtkinter"
+    "customtkinter",
+    "ttkthemes"
 ]
 
 [project.scripts]

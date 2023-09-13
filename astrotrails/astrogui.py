@@ -3,6 +3,7 @@ import os
 import customtkinter
 from customtkinter import filedialog
 import threading
+import ttkthemes
 from PIL import Image
 
 
@@ -14,6 +15,8 @@ class App(customtkinter.CTk):
         super().__init__()
         self.title("Astrotrails")
         self.geometry("700x450")
+        self.style = ttkthemes.ThemedStyle()
+        self.style.theme_use('breeze')
         frame=MainFrame(self)
         self.mainloop()
 
@@ -29,7 +32,7 @@ class MainFrame(customtkinter.CTkFrame):
         label.pack(pady=50)
         getDir = customtkinter.CTkButton(master=self, text="Open Directory", font=("calibri",20), command=self.getDirectory)
         getDir.pack(side="left", padx=20, expand=True)
-        gen = customtkinter.CTkButton(master=self, text="Generate", font=("calibri",20), command=lambda: [self.generate()])
+        gen = customtkinter.CTkButton(master=self, text="Generate", font=("calibri",20), command=self.generate)
         gen.pack(side="right", padx=20, expand=True)
         global mode
         mode = customtkinter.CTkComboBox(master=self, width=220, values=["Stacking & Video", "Stacking", "Video"], font=("calibri",20))
@@ -107,9 +110,19 @@ class generation(customtkinter.CTkToplevel):
         pb.destroy()
         infoLabel.destroy()
         generationText.set("Generation completed")
-        startrailsImage = customtkinter.CTkImage(Image.open(os.path.join(path,imageName)), size=(300,300))
+        w, h = self.winfo_screenwidth(), self.winfo_screenheight()
+        imWid = Image.open(os.path.join(path,imageName)).size[0]
+        imHgt = Image.open(os.path.join(path,imageName)).size[1]
+        while imWid>(w-40) or imHgt>(h-200):
+            imWid = imWid*0.98
+            imHgt = imHgt*0.98
+        startrailsImage = customtkinter.CTkImage(Image.open(os.path.join(path,imageName)), size=(imWid,imHgt))
         customtkinter.CTkLabel(master=self, text="", image=startrailsImage).pack()
-        self.geometry("400x450")
+        anotherButton = customtkinter.CTkButton(master=self, text="Generate another", font=("calibri",20), command=self.destroy)
+        anotherButton.pack(side="left", padx=20, pady=20, expand=True)
+        exitButton = customtkinter.CTkButton(master=self, text="Close", font=("calibri",20), command=exit)
+        exitButton.pack(side="right", padx=20, pady=20, expand=True)
+        self.attributes('-zoomed', True)
 
 if __name__ == "__main__":
     App()
