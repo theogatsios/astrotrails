@@ -24,3 +24,4 @@ The execution of the above will search for jpegs files into `jpegsDirectory` and
 astrotrails-gui
 ```
 
+![](documentation/demo.webm)
