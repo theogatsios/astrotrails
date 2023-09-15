@@ -24,4 +24,4 @@ The execution of the above will search for jpegs files into `jpegsDirectory` and
 astrotrails-gui
 ```
 
-[![Demo](https://github.com/theogatsios/astrotrails/blob/main/documentation/demo.gif)
+![Demo](https://github.com/theogatsios/astrotrails/blob/main/documentation/demo.gif)
