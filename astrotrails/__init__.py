@@ -1,6 +1,6 @@
 import sys, os, numpy, time
-from progress.bar import Bar
 from PIL import Image
+from tqdm import tqdm
 
 def manual():
   print(23*"*")
@@ -33,18 +33,14 @@ def stacking(imagePath, pictureList, outputName, savePath):
   width, height = Image.open(pictureList[0]).size
   stack = numpy.zeros((height, width, 3), float)
 
-  bar = Bar("Stacking", max = len(pictureList))
-  for pic in pictureList:
+  for pic in tqdm(pictureList, desc="Stacking"):
     processedPic = numpy.array(Image.open(pic), dtype = float)
     stack = numpy.maximum(stack, processedPic)
-
-    bar.next()
     
   stack = numpy.array(numpy.round(stack), dtype = numpy.uint8)
   output = Image.fromarray(stack, mode = "RGB")
   os.chdir(savePath)
   output.save(outputName, "JPEG")
-  bar.finish()
 
 
 def stackingSBS(imagePath, pictureList, sbsPath):
@@ -52,20 +48,17 @@ def stackingSBS(imagePath, pictureList, sbsPath):
   width, height = Image.open(pictureList[0]).size
   stack = numpy.zeros((height, width, 3), float)
   zerosNumber = len(pictureList)
-  bar = Bar("Stacking step by step", max = len(pictureList))
-  for i, pic in enumerate(pictureList):
+  for i, pic in enumerate(tqdm(pictureList, desc="Stacking step by step")):
     os.chdir(imagePath)
     processedPic = numpy.array(Image.open(pic), dtype = float)
     stack = numpy.maximum(stack, processedPic)
     num = str(i)
     while len(num) < len(str(zerosNumber)):
       num = "0" + num
-    bar.next()
     stack = numpy.array(numpy.round(stack), dtype = numpy.uint8)
     output = Image.fromarray(stack, mode = "RGB")
     os.chdir(sbsPath)
     output.save("Stacking_%s"%num, "JPEG")
-  bar.finish()
   
   
 def timelapseVideo(path, sbsPath, fps, outputName):
