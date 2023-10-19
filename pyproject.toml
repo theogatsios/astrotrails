@@ -23,6 +23,7 @@ dependencies = [
     "ffmpeg",
     "customtkinter",
     "ttkthemes"
+    "packaging"
 ]
 
 [project.scripts]
