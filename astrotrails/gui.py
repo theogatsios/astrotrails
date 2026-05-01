@@ -261,7 +261,7 @@ class StackingWorker(QThread):
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle(f"Astrotrails")
+        self.setWindowTitle("Astrotrails")
         self.resize(1000, 720)
         self._worker: StackingWorker | None = None
         self._build_ui()
