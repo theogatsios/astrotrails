@@ -1,5 +1,6 @@
 include README.md CHANGELOG.md LICENSE.txt pyproject.toml
 recursive-include astrotrails *.py
+recursive-include astrotrails *.svg
 recursive-include tests *.py
 recursive-exclude documentation *
 recursive-exclude packaging *

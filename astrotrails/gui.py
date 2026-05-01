@@ -48,7 +48,18 @@ from .video import FFmpegNotFound, FFmpegPipeWriter
 
 # ------------------------------------------------------------------ styling ---
 
-AWESOME_DARK_QSS = """
+def _check_svg_uri() -> str:
+    """Return an absolute path to the bundled check.svg asset, in QSS-friendly form.
+
+    Qt's QSS accepts plain absolute paths in url(...) — and unlike url(file:///...)
+    this works consistently across platforms.  Forward slashes are accepted on
+    Windows too; backslashes confuse the QSS parser.
+    """
+    asset = Path(__file__).parent / "assets" / "check.svg"
+    return asset.resolve().as_posix()
+
+
+_AWESOME_DARK_QSS_TEMPLATE = """
 QWidget {
     background-color: #1e2228;
     color: #d7dce2;
@@ -98,6 +109,11 @@ QPushButton:pressed { background-color: #4fa2b3; }
 QPushButton:disabled { color: #4a5058; border-color: #3a4049; }
 QPushButton#danger { color: #e8b84b; border-color: #e8b84b; }
 QPushButton#danger:hover { background-color: #e8b84b; color: #1e2228; }
+QPushButton#danger:disabled {
+    color: #4a5058;
+    border-color: #3a4049;
+    background-color: transparent;
+}
 QLabel#heading {
     color: #6bb8c9;
     font-size: 18pt;
@@ -126,11 +142,22 @@ QCheckBox::indicator {
     width: 14px;
     height: 14px;
     border: 1px solid #6bb8c9;
-    background-color: #2a2f36;
+    background-color: transparent;
     border-radius: 2px;
 }
-QCheckBox::indicator:checked { background-color: #6bb8c9; }
+QCheckBox::indicator:checked {
+    background-color: transparent;
+    image: url(__CHECK_SVG__);
+}
+QCheckBox::indicator:disabled {
+    border-color: #3a4049;
+}
 """
+
+
+def awesome_dark_qss() -> str:
+    """Return the assembled stylesheet with the checkmark SVG path baked in."""
+    return _AWESOME_DARK_QSS_TEMPLATE.replace("__CHECK_SVG__", _check_svg_uri())
 
 
 # ------------------------------------------------------------------ worker ---
@@ -234,11 +261,11 @@ class StackingWorker(QThread):
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle(f"astrotrails {__version__}")
+        self.setWindowTitle(f"Astrotrails")
         self.resize(1000, 720)
         self._worker: StackingWorker | None = None
         self._build_ui()
-        self.setStyleSheet(AWESOME_DARK_QSS)
+        self.setStyleSheet(awesome_dark_qss())
 
     # -- UI construction --------------------------------------------------
 
@@ -248,15 +275,6 @@ class MainWindow(QMainWindow):
         root = QVBoxLayout(central)
         root.setContentsMargins(16, 16, 16, 16)
         root.setSpacing(10)
-
-        heading = QLabel("ASTROTRAILS")
-        heading.setObjectName("heading")
-        heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        sub = QLabel("max-value & comet-mode stacking · v" + __version__)
-        sub.setObjectName("subheading")
-        sub.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        root.addWidget(heading)
-        root.addWidget(sub)
 
         # Split: controls left, log + preview right.
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -369,21 +387,25 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(wrap)
         layout.setSpacing(8)
 
+        # Preview goes on top, no group-box header — the image speaks for itself.
+        preview_wrap = QWidget()
+        prev_l = QVBoxLayout(preview_wrap)
+        prev_l.setContentsMargins(0, 0, 0, 0)
+        self.preview_label = QLabel("Generated image will appear here")
+        self.preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.preview_label.setMinimumHeight(220)
+        self.preview_label.setStyleSheet(
+            "color:#5a6068; border:1px solid #3a4049; border-radius:2px;"
+        )
+        prev_l.addWidget(self.preview_label)
+        layout.addWidget(preview_wrap, 1)
+
         log_box = QGroupBox("LOG")
         log_l = QVBoxLayout(log_box)
         self.log_view = QTextEdit()
         self.log_view.setReadOnly(True)
         log_l.addWidget(self.log_view)
         layout.addWidget(log_box, 1)
-
-        preview_box = QGroupBox("PREVIEW")
-        prev_l = QVBoxLayout(preview_box)
-        self.preview_label = QLabel("(the stacked image will appear here)")
-        self.preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.preview_label.setMinimumHeight(220)
-        self.preview_label.setStyleSheet("color:#5a6068;")
-        prev_l.addWidget(self.preview_label)
-        layout.addWidget(preview_box, 1)
 
         return wrap
 

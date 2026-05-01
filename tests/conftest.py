@@ -10,7 +10,7 @@ from PIL import Image
 
 
 def _write_jpeg(path: Path, arr: np.ndarray) -> None:
-    Image.fromarray(arr, mode="RGB").save(path, "JPEG", quality=95)
+    Image.fromarray(arr).save(path, "JPEG", quality=95)
 
 
 @pytest.fixture

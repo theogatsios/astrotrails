@@ -199,7 +199,7 @@ def save_image(
     """Save a stacked array, optionally copying EXIF from a source image."""
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    img = Image.fromarray(stacked, mode="RGB")
+    img = Image.fromarray(stacked)
     save_kwargs: dict[str, object] = {}
     if exif_source is not None:
         try:

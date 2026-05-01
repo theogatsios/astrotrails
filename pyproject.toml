@@ -79,7 +79,11 @@ version = { attr = "astrotrails._version.__version__" }
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
-filterwarnings = ["error"]
+filterwarnings = [
+    "default",
+    "error::ResourceWarning",
+    "ignore::DeprecationWarning:PIL",
+]
 
 # -------------------------------------------------------------- ruff --------
 

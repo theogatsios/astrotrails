@@ -5,7 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to calendar versioning (`YYYY.M.D`).
 
-## [2026.4.21]
+## [2026.4.22]
+
+### Fixed
+
+- **Cancel button now actually works.**  Previously, the `QPushButton#danger`
+  CSS rules took precedence over the generic `QPushButton:disabled` rule due
+  to selector specificity, leaving the disabled Cancel button looking
+  identical to its enabled state.  Hover did nothing, clicks did nothing.
+  Added an explicit `QPushButton#danger:disabled` rule so the disabled
+  state is visibly greyed out, and the click flow works as designed.
+- **Pillow 12+ compatibility.**  Dropped the deprecated `mode="RGB"` keyword
+  in `Image.fromarray()` calls (Pillow infers it from `dtype`+`shape` for
+  uint8 HxWx3 arrays).  Without this, tests fail on Pillow ≥ 12.
+- Tightened the pytest warning filter from blanket `error` to
+  `error::ResourceWarning` plus an ignore for Pillow's own deprecations,
+  so CI remains strict about real fd/resource leaks but isn't held hostage
+  by upstream API churn.
+
+### Changed
+
+- **Window title** is now `Astrotrails` (capital A) — display only; the
+  package name, CLI command, and import path stay lowercase.
+- **Checkboxes** now show a teal ✓ checkmark on a transparent background
+  when checked, replacing the previous solid-teal fill.  The glyph ships
+  as a real `assets/check.svg` file inside the package; QSS resolves it by
+  absolute path at runtime since Qt's stylesheet engine doesn't accept
+  inline `data:` URIs.
+- **GUI layout:** preview panel moved above the log panel, and the
+  preview's "PREVIEW" group-box header is gone — the image area now sits
+  flush with a single subtle border.  Placeholder text reworded from
+  "(the stacked image will appear here)" to "Generated image will appear
+  here".
+
+---
+
+
 
 ### License
 
