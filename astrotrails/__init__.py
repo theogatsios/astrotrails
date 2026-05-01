@@ -1,68 +1,39 @@
-import sys, os, numpy, time
-from PIL import Image
-from tqdm import tqdm
+# astrotrails: generate startrails images and timelapse videos.
+# Copyright (C) 2026 Theodoros Gatsios
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""astrotrails — stack night-sky photographs into startrails and timelapses."""
 
-def manual():
-  print(23*"*")
-  print("***"+(17*" ")+"***")
-  print("***   Astrotrails   ***")
-  print("***"+(17*" ")+"***")
-  print(23*"*")
-  print("Tool to generate startrails image and timelapse video using jpegs photographs.")
-  print()
-  print("usage: astrotrails <imagesPath> <mode> [imageName] [timelapseFPS] [timelapseVideoName]")
-  print()
-  print(10*" "+"<imagesPath> : The path containing the images to stack" )
-  print()
-  print(10*" "+"<mode> : Selection of one of the modes below:" )
-  print(19*" "+"1. Both Stacking and Timelapse Video")
-  print(19*" "+"2. Only Stacking")
-  print(19*" "+"3. Only Timelapse Video with step by step stacking")
-  print(19*" "+"4. Only Timelapse Video without step by step stacking")
-  print()
-  print(10*" "+"[imageName=] : Name of the output picture" )
-  print()
-  print(10*" "+"[fps=] : Frames per second of the timelapse video" )
-  print()
-  print(10*" "+"[videoName=] : Name of the timelapse video" )
-  print()
+from ._version import __version__
+from .core import (
+    StackMode,
+    list_images,
+    load_dark_frame,
+    save_image,
+    stack,
+    stack_frames,
+)
+from .video import FFmpegPipeWriter, find_ffmpeg
 
-
-def stacking(imagePath, pictureList, outputName, savePath):
-  os.chdir(imagePath)
-  width, height = Image.open(pictureList[0]).size
-  stack = numpy.zeros((height, width, 3), float)
-
-  for pic in tqdm(pictureList, desc="Stacking"):
-    processedPic = numpy.array(Image.open(pic), dtype = float)
-    stack = numpy.maximum(stack, processedPic)
-    
-  stack = numpy.array(numpy.round(stack), dtype = numpy.uint8)
-  output = Image.fromarray(stack, mode = "RGB")
-  os.chdir(savePath)
-  output.save(outputName, "JPEG")
-
-
-def stackingSBS(imagePath, pictureList, sbsPath):
-  os.chdir(imagePath)
-  width, height = Image.open(pictureList[0]).size
-  stack = numpy.zeros((height, width, 3), float)
-  zerosNumber = len(pictureList)
-  for i, pic in enumerate(tqdm(pictureList, desc="Stacking step by step")):
-    os.chdir(imagePath)
-    processedPic = numpy.array(Image.open(pic), dtype = float)
-    stack = numpy.maximum(stack, processedPic)
-    num = str(i)
-    while len(num) < len(str(zerosNumber)):
-      num = "0" + num
-    stack = numpy.array(numpy.round(stack), dtype = numpy.uint8)
-    output = Image.fromarray(stack, mode = "RGB")
-    os.chdir(sbsPath)
-    output.save("Stacking_%s"%num, "JPEG")
-  
-  
-def timelapseVideo(path, sbsPath, fps, outputName):
-  os.chdir(sbsPath)
-  print("Generating video...")
-  os.system("ffmpeg -r %s -f image2 -pattern_type glob -i 'Stacking_*' -vcodec libx264 %s/%s -y >/dev/null 2>&1"%(fps, path, outputName))
-  
+__all__ = [
+    "__version__",
+    "StackMode",
+    "FFmpegPipeWriter",
+    "find_ffmpeg",
+    "list_images",
+    "load_dark_frame",
+    "save_image",
+    "stack",
+    "stack_frames",
+]

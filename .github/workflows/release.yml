@@ -1,0 +1,149 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write        # for creating the Release
+  packages: write        # for publishing to GHCR
+
+jobs:
+  # ---------------------------------------------------------------- PyPI ---
+  pypi:
+    name: Build & publish to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - run: pip install --upgrade pip build twine
+
+      - name: Build sdist + wheel
+        run: python -m build
+
+      - name: Upload to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*
+
+      - uses: actions/upload-artifact@v4
+        with: { name: pypi, path: dist/* }
+
+  # ---------------------------------------------------------------- .deb ---
+  deb:
+    name: Build .deb
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Install fpm
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby ruby-dev build-essential
+          sudo gem install --no-document fpm
+
+      - name: Build .deb
+        run: packaging/debian/build-deb.sh
+
+      - uses: actions/upload-artifact@v4
+        with: { name: deb, path: packaging/debian/*.deb }
+
+  # ---------------------------------------------------------------- AppImage
+  appimage:
+    name: Build .AppImage
+    runs-on: ubuntu-22.04           # pin glibc 2.35 for broad compatibility
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Install AppImage tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 wget
+          pip install --upgrade pip python-appimage
+
+      - name: Build AppImage
+        run: packaging/appimage/build-appimage.sh
+
+      - uses: actions/upload-artifact@v4
+        with: { name: appimage, path: packaging/appimage/*.AppImage }
+
+  # ---------------------------------------------------------------- Windows
+  windows:
+    name: Build Windows .exe
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[gui]"
+          pip install pyinstaller
+
+      - name: Build .exe
+        run: pyinstaller packaging\windows\astrotrails.spec --clean
+
+      - uses: actions/upload-artifact@v4
+        with: { name: windows, path: dist/*.exe }
+
+  # ---------------------------------------------------------------- Docker
+  docker:
+    name: Build & push Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Resolve version
+        id: ver
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: packaging/docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/astrotrails:latest
+            ghcr.io/${{ github.repository_owner }}/astrotrails:${{ steps.ver.outputs.VERSION }}
+
+  # ---------------------------------------------------------------- Release
+  release:
+    name: Create GitHub Release
+    needs: [pypi, deb, appimage, windows, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect artefacts
+        uses: actions/download-artifact@v4
+        with: { path: artefacts }
+
+      - name: Attach to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: CHANGELOG.md
+          files: |
+            artefacts/pypi/*
+            artefacts/deb/*.deb
+            artefacts/appimage/*.AppImage
+            artefacts/windows/*.exe

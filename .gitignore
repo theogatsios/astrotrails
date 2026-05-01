@@ -1,0 +1,33 @@
+# build artefacts
+build/
+dist/
+*.egg-info/
+*.whl
+*.tar.gz
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# packaging
+packaging/**/AppDir/
+packaging/**/*.AppImage
+packaging/**/*.deb
+packaging/**/build/
+packaging/windows/build/
+packaging/windows/dist/
+packaging/windows/*.spec.bak
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# virtualenvs
+.venv/
+venv/
+env/

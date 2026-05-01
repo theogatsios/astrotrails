@@ -1,34 +1,102 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "astrotrails"
-version = "2023.10.13"
-authors = [
-    {name = "Theo Gatsios", email = "theogat@protonmail.com"},
-]
-description = "Tool to generate startrails images by stacking consecutive images of nightsky in jpeg format. Also, astrotrails can create a timelapse video."
+dynamic = ["version"]
+description = "Generate startrails images and timelapse videos by stacking night-sky photographs."
 readme = "README.md"
-requires-python = ">=3.7"
-keywords = ["astrophotography", "startrails", "astrotrails"]
-license = {file = "LICENSE.txt"}
+requires-python = ">=3.9"
+license = { file = "LICENSE.txt" }
+authors = [
+    { name = "Theo Gatsios", email = "theogat@protonmail.com" },
+]
+maintainers = [
+    { name = "Theo Gatsios", email = "theogat@protonmail.com" },
+]
+keywords = ["astrophotography", "startrails", "timelapse", "stacking", "comet-mode"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Image Processing",
 ]
 dependencies = [
-    "numpy",
-    "Pillow",
-    "tqdm",
-    "ffmpeg",
-    "customtkinter",
-    "ttkthemes"
-    "packaging"
+    "numpy>=1.22",
+    "Pillow>=9.0",
+    "tqdm>=4.60",
+    "imageio-ffmpeg>=0.4.9",
+]
+
+[project.optional-dependencies]
+gui = ["PyQt6>=6.5"]
+dev = [
+    "pytest>=7",
+    "pytest-cov>=4",
+    "ruff>=0.4",
+    "build>=1.0",
+    "twine>=4.0",
 ]
 
 [project.scripts]
-astrotrails = "astrotrails.command_line:main"
-astrotrails-gui = "astrotrails.astrogui:App"
+astrotrails = "astrotrails.cli:main"
+astrotrails-gui = "astrotrails.gui:main"
 
-# ... other project metadata fields as specified in:
-#     https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
+[project.urls]
+Homepage      = "https://github.com/theogatsios/astrotrails"
+Repository    = "https://github.com/theogatsios/astrotrails"
+Issues        = "https://github.com/theogatsios/astrotrails/issues"
+Changelog     = "https://github.com/theogatsios/astrotrails/blob/main/CHANGELOG.md"
+
+# -------------------------------------------------------------- setuptools ---
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["astrotrails*"]
+exclude = ["tests*", "packaging*", "documentation*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "astrotrails._version.__version__" }
+
+# -------------------------------------------------------------- pytest ------
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error"]
+
+# -------------------------------------------------------------- ruff --------
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+extend-exclude = ["packaging", "documentation"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",              # isort
+    "B",              # flake8-bugbear
+    "UP",             # pyupgrade
+    "SIM",            # flake8-simplify
+    "C4",             # flake8-comprehensions
+]
+ignore = [
+    "E501",           # line length handled by formatter
+]
